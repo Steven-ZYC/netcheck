@@ -1,7 +1,9 @@
 mod cli;
+mod dns;
 mod network;
 mod speedtest;
 mod system;
+mod trace;
 mod utils;
 
 use clap::Parser;
@@ -50,6 +52,16 @@ async fn run_speed() {
     speedtest::run_speed_test(&client).await;
 }
 
+async fn run_dns() {
+    utils::print_header();
+    dns::run_dns_test().await;
+}
+
+async fn run_trace() {
+    utils::print_header();
+    trace::run_trace().await;
+}
+
 #[tokio::main]
 async fn main() {
     let cli = Cli::parse();
@@ -59,5 +71,7 @@ async fn main() {
         Some(Commands::Info) => run_info().await,
         Some(Commands::Net) => run_net().await,
         Some(Commands::Speed) => run_speed().await,
+        Some(Commands::Dns) => run_dns().await,
+        Some(Commands::Trace) => run_trace().await,
     }
 }

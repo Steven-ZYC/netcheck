@@ -15,4 +15,8 @@ pub enum Commands {
     Net,
     /// Run speed test only
     Speed,
+    /// Test DNS resolver latency
+    Dns,
+    /// Trace route to Cloudflare (1.1.1.1)
+    Trace,
 }
