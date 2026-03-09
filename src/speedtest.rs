@@ -9,6 +9,7 @@ use serde::Deserialize;
 const CONNECTIONS: usize = 8;
 const WARMUP_SECS: u64 = 2;
 const MEASURE_SECS: u64 = 10;
+const TICK_MS: u64 = 200;
 const UPLOAD_CHUNK: usize = 4_000_000; // 4MB per POST
 
 // Speed test servers by region
@@ -188,14 +189,6 @@ pub async fn test_download_speed(
     let total_bytes = Arc::new(AtomicU64::new(0));
     let stop = Arc::new(AtomicBool::new(false));
 
-    let pb = indicatif::ProgressBar::new(MEASURE_SECS);
-    pb.set_style(
-        indicatif::ProgressStyle::default_bar()
-            .template("    {bar:40.green} {pos}/{len}s {msg}")
-            .unwrap()
-            .progress_chars("██░"),
-    );
-
     // Spawn parallel download workers — always count bytes
     let mut handles = Vec::new();
     for _ in 0..CONNECTIONS {
@@ -226,22 +219,37 @@ pub async fn test_download_speed(
         }));
     }
 
-    // Warmup: let connections ramp up, then reset counter
-    print!("    Warming up... ");
-    std::io::stdout().flush().ok();
+    // Warmup with spinner
+    let spinner = indicatif::ProgressBar::new_spinner();
+    spinner.set_style(
+        indicatif::ProgressStyle::default_spinner()
+            .template("    {spinner:.yellow} Warming up...")
+            .unwrap(),
+    );
+    spinner.enable_steady_tick(Duration::from_millis(80));
     tokio::time::sleep(Duration::from_secs(WARMUP_SECS)).await;
     total_bytes.store(0, Ordering::Relaxed);
-    println!("done");
+    spinner.finish_and_clear();
 
-    // Measure
+    // Measure with fast refresh
+    println!("    Measuring download...");
+    let pb = indicatif::ProgressBar::new(MEASURE_SECS * 1000 / TICK_MS);
+    pb.set_style(
+        indicatif::ProgressStyle::default_bar()
+            .template("    {bar:40.green} {elapsed_precise} {msg}")
+            .unwrap()
+            .progress_chars("━━╺"),
+    );
+
     let measure_start = Instant::now();
-    for sec in 1..=MEASURE_SECS {
-        tokio::time::sleep(Duration::from_secs(1)).await;
+    let total_ticks = MEASURE_SECS * 1000 / TICK_MS;
+    for tick in 1..=total_ticks {
+        tokio::time::sleep(Duration::from_millis(TICK_MS)).await;
         let elapsed = measure_start.elapsed().as_secs_f64();
         let bytes = total_bytes.load(Ordering::Relaxed);
         let speed_mbps = (bytes as f64 * 8.0) / elapsed / 1_000_000.0;
-        pb.set_position(sec);
-        pb.set_message(format!("\x1b[33m{:.1} Mbps\x1b[0m", speed_mbps));
+        pb.set_position(tick);
+        pb.set_message(format!("\x1b[1;33m{:.1} Mbps\x1b[0m", speed_mbps));
     }
 
     stop.store(true, Ordering::Relaxed);
@@ -264,14 +272,6 @@ pub async fn test_download_speed(
 pub async fn test_upload_speed(client: &reqwest::Client) -> Result<f64, String> {
     let total_bytes = Arc::new(AtomicU64::new(0));
     let stop = Arc::new(AtomicBool::new(false));
-
-    let pb = indicatif::ProgressBar::new(MEASURE_SECS);
-    pb.set_style(
-        indicatif::ProgressStyle::default_bar()
-            .template("    {bar:40.cyan} {pos}/{len}s {msg}")
-            .unwrap()
-            .progress_chars("██░"),
-    );
 
     let upload_data: Arc<Vec<u8>> = Arc::new(vec![0u8; UPLOAD_CHUNK]);
 
@@ -302,22 +302,37 @@ pub async fn test_upload_speed(client: &reqwest::Client) -> Result<f64, String> 
         }));
     }
 
-    // Warmup: let connections ramp up, then reset counter
-    print!("    Warming up... ");
-    std::io::stdout().flush().ok();
+    // Warmup with spinner
+    let spinner = indicatif::ProgressBar::new_spinner();
+    spinner.set_style(
+        indicatif::ProgressStyle::default_spinner()
+            .template("    {spinner:.yellow} Warming up...")
+            .unwrap(),
+    );
+    spinner.enable_steady_tick(Duration::from_millis(80));
     tokio::time::sleep(Duration::from_secs(WARMUP_SECS)).await;
     total_bytes.store(0, Ordering::Relaxed);
-    println!("done");
+    spinner.finish_and_clear();
 
-    // Measure
+    // Measure with fast refresh
+    println!("    Measuring upload...");
+    let pb = indicatif::ProgressBar::new(MEASURE_SECS * 1000 / TICK_MS);
+    pb.set_style(
+        indicatif::ProgressStyle::default_bar()
+            .template("    {bar:40.cyan} {elapsed_precise} {msg}")
+            .unwrap()
+            .progress_chars("━━╺"),
+    );
+
     let measure_start = Instant::now();
-    for sec in 1..=MEASURE_SECS {
-        tokio::time::sleep(Duration::from_secs(1)).await;
+    let total_ticks = MEASURE_SECS * 1000 / TICK_MS;
+    for tick in 1..=total_ticks {
+        tokio::time::sleep(Duration::from_millis(TICK_MS)).await;
         let elapsed = measure_start.elapsed().as_secs_f64();
         let bytes = total_bytes.load(Ordering::Relaxed);
         let speed_mbps = (bytes as f64 * 8.0) / elapsed / 1_000_000.0;
-        pb.set_position(sec);
-        pb.set_message(format!("\x1b[33m{:.1} Mbps\x1b[0m", speed_mbps));
+        pb.set_position(tick);
+        pb.set_message(format!("\x1b[1;33m{:.1} Mbps\x1b[0m", speed_mbps));
     }
 
     stop.store(true, Ordering::Relaxed);
@@ -381,10 +396,7 @@ pub async fn run_speed_test(client: &reqwest::Client) {
     println!();
 
     // Download
-    println!(
-        "    Testing download ({} connections, {}+{}s)...",
-        CONNECTIONS, WARMUP_SECS, MEASURE_SECS
-    );
+    println!("    \x1b[1m↓ Download\x1b[0m ({} connections)", CONNECTIONS);
     match test_download_speed(client, server).await {
         Ok(speed) => println!("    \x1b[32m↓ Download: {:.1} Mbps\x1b[0m", speed),
         Err(e) => {
@@ -405,10 +417,7 @@ pub async fn run_speed_test(client: &reqwest::Client) {
     println!();
 
     // Upload
-    println!(
-        "    Testing upload ({} connections, {}+{}s)...",
-        CONNECTIONS, WARMUP_SECS, MEASURE_SECS
-    );
+    println!("    \x1b[1m↑ Upload\x1b[0m ({} connections)", CONNECTIONS);
     match test_upload_speed(client).await {
         Ok(speed) => println!("    \x1b[32m↑ Upload: {:.1} Mbps\x1b[0m", speed),
         Err(e) => println!("    \x1b[31m↑ Upload: Error: {}\x1b[0m", e),
