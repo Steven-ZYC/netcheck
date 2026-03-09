@@ -9,6 +9,8 @@
 - **系統資訊** — 主機名、作業系統、CPU、核心、架構
 - **網卡資訊** — 介面名稱、驅動程式、MAC 地址、連結狀態、雙工模式
 - **網速測試** — HTTP 延遲（含抖動）、多連接並行下載與上傳（Cloudflare）
+- **DNS 測試** — 原始 UDP 查詢 6 個公共 DNS 解析器，按延遲排名
+- **路由追蹤** — tracepath 彩色輸出，無需 root 權限
 
 ## 安裝
 
@@ -28,6 +30,8 @@ netcheck
 netcheck info     # 僅系統資訊
 netcheck net      # 僅網卡資訊
 netcheck speed    # 僅測速
+netcheck dns      # DNS 解析器延遲測試
+netcheck trace    # 路由追蹤到 Cloudflare
 ```
 
 ## 輸出範例
@@ -70,6 +74,8 @@ src/
 ├── system.rs      # 系統資訊採集
 ├── network.rs     # 網卡檢測
 ├── speedtest.rs   # 測速（延遲、下載、上傳）
+├── dns.rs         # DNS 解析器延遲測試
+├── trace.rs       # 路由追蹤（tracepath/traceroute）
 └── utils.rs       # 顯示輔助函式
 ```
 
@@ -79,6 +85,8 @@ src/
 - **HTTP 延遲測試**，含抖動計算，無需依賴 `ping` 指令
 - 基於 IP 地理位置**自動選擇測速伺服器**
 - **優雅的錯誤處理**，伺服器不可用時自動切換
+- **DNS 延遲測試**，原始 UDP 封包查詢 6 個解析器（Cloudflare、Google、Alibaba、OpenDNS、Quad9、系統），自動排名
+- **路由追蹤**，使用 `tracepath`（無需 root），即時串流輸出，彩色顯示跳數和延遲
 
 ## 依賴
 

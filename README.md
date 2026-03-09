@@ -9,6 +9,8 @@ A high-performance Linux CLI tool for network speed testing and device informati
 - **System Info** — Hostname, OS, CPU, Kernel, Architecture
 - **Network Devices** — Interface name, driver, MAC address, link state, duplex
 - **Speed Test** — Latency (HTTP-based with jitter), multi-connection download & upload via Cloudflare
+- **DNS Test** — Raw UDP queries to 6 public resolvers, ranked by latency
+- **Route Trace** — Tracepath with colorized output, no root required
 
 ## Install
 
@@ -28,6 +30,8 @@ netcheck
 netcheck info     # System information only
 netcheck net      # Network interfaces only
 netcheck speed    # Speed test only
+netcheck dns      # DNS resolver latency test
+netcheck trace    # Route trace to Cloudflare
 ```
 
 ## Example Output
@@ -70,6 +74,8 @@ src/
 ├── system.rs      # System info collection
 ├── network.rs     # Network interface detection
 ├── speedtest.rs   # Speed test (latency, download, upload)
+├── dns.rs         # DNS resolver latency testing
+├── trace.rs       # Route tracing (tracepath/traceroute)
 └── utils.rs       # Display helpers
 ```
 
@@ -79,6 +85,8 @@ src/
 - **HTTP-based latency** test with jitter calculation (no dependency on `ping`)
 - **Automatic server selection** based on IP geolocation
 - **Graceful error handling** with server fallback
+- **DNS latency test** with raw UDP packets to 6 resolvers (Cloudflare, Google, Alibaba, OpenDNS, Quad9, system), auto-ranked
+- **Route trace** via `tracepath` (no root needed), real-time streaming output with colorized hops
 
 ## Dependencies
 
