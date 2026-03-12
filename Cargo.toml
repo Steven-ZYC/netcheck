@@ -1,6 +1,6 @@
 [package]
 name = "netcheck"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2024"
 authors = ["Steven Zhang Yancheng"]
 description = "High-performance Linux CLI for network diagnostics, speed tests, DNS checks, and route tracing"

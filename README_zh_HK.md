@@ -16,16 +16,20 @@
 
 ### 方式 1：安裝原生套件
 
-- Debian / Ubuntu：下載最新 Release 中的 `.deb` 檔案後安裝：
+- Debian / Ubuntu：下載與 CPU 架構相符的 `.deb` 檔案後安裝：
 
 ```bash
 sudo apt install ./netcheck_<version>_amd64.deb
+# 或
+sudo apt install ./netcheck_<version>_arm64.deb
 ```
 
-- Fedora / RHEL / Rocky / AlmaLinux / openSUSE：下載最新 Release 中的 `.rpm` 檔案後安裝：
+- Fedora / RHEL / Rocky / AlmaLinux / openSUSE：下載與 CPU 架構相符的 `.rpm` 檔案後安裝：
 
 ```bash
 sudo dnf install ./netcheck-<version>-1.x86_64.rpm
+# 或
+sudo dnf install ./netcheck-<version>-1.aarch64.rpm
 ```
 
 這類原生套件會宣告 `dns` 和 `trace` 子命令需要的執行時依賴，套件管理器可以自動處理。

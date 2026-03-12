@@ -16,16 +16,20 @@ A high-performance Linux CLI tool for network speed testing and device informati
 
 ### Option 1: Install a native package
 
-- Debian / Ubuntu: download the `.deb` asset from the latest release and install it with:
+- Debian / Ubuntu: download the `.deb` asset that matches your CPU architecture and install it with:
 
 ```bash
 sudo apt install ./netcheck_<version>_amd64.deb
+# or
+sudo apt install ./netcheck_<version>_arm64.deb
 ```
 
-- Fedora / RHEL / Rocky / AlmaLinux / openSUSE: download the `.rpm` asset from the latest release and install it with:
+- Fedora / RHEL / Rocky / AlmaLinux / openSUSE: download the `.rpm` asset that matches your CPU architecture and install it with:
 
 ```bash
 sudo dnf install ./netcheck-<version>-1.x86_64.rpm
+# or
+sudo dnf install ./netcheck-<version>-1.aarch64.rpm
 ```
 
 These native packages declare the runtime dependencies needed by the `dns` and `trace` commands, so package managers can install them automatically.
@@ -79,7 +83,7 @@ The binary is at `target/release/netcheck`.
 GitHub Actions automates the project lifecycle:
 
 - `CI`: runs `cargo fmt --check`, `cargo clippy -D warnings`, and `cargo test --locked` on pushes to `master` and pull requests
-- `Release`: on `v*` tags, builds Linux release archives for `x86_64` and `aarch64`, builds native `.deb` and `.rpm` packages for `x86_64`, creates a GitHub Release, and uploads all artifacts plus SHA-256 checksum files
+- `Release`: on `v*` tags, builds Linux release archives for `x86_64` and `aarch64`, builds native `.deb` and `.rpm` packages for both `x86_64` and `aarch64`, creates a GitHub Release, and uploads all artifacts plus SHA-256 checksum files
 
 Create a release with:
 

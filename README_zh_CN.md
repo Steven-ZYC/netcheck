@@ -16,16 +16,20 @@
 
 ### 方式 1：安装原生软件包
 
-- Debian / Ubuntu：下载最新 Release 中的 `.deb` 文件，然后安装：
+- Debian / Ubuntu：下载与你的 CPU 架构匹配的 `.deb` 文件，然后安装：
 
 ```bash
 sudo apt install ./netcheck_<version>_amd64.deb
+# 或
+sudo apt install ./netcheck_<version>_arm64.deb
 ```
 
-- Fedora / RHEL / Rocky / AlmaLinux / openSUSE：下载最新 Release 中的 `.rpm` 文件，然后安装：
+- Fedora / RHEL / Rocky / AlmaLinux / openSUSE：下载与你的 CPU 架构匹配的 `.rpm` 文件，然后安装：
 
 ```bash
 sudo dnf install ./netcheck-<version>-1.x86_64.rpm
+# 或
+sudo dnf install ./netcheck-<version>-1.aarch64.rpm
 ```
 
 这类原生软件包会声明 `dns` 和 `trace` 子命令需要的运行时依赖，包管理器可以自动处理。
