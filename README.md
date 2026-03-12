@@ -12,7 +12,61 @@ A high-performance Linux CLI tool for network speed testing and device informati
 - **DNS Test** — Raw UDP queries to 6 public resolvers, ranked by latency
 - **Route Trace** — Tracepath with colorized output, no root required
 
-## Install
+## Installation Guide
+
+### Option 1: Install a native package
+
+- Debian / Ubuntu: download the `.deb` asset from the latest release and install it with:
+
+```bash
+sudo apt install ./netcheck_<version>_amd64.deb
+```
+
+- Fedora / RHEL / Rocky / AlmaLinux / openSUSE: download the `.rpm` asset from the latest release and install it with:
+
+```bash
+sudo dnf install ./netcheck-<version>-1.x86_64.rpm
+```
+
+These native packages declare the runtime dependencies needed by the `dns` and `trace` commands, so package managers can install them automatically.
+
+### Option 2: Use the portable binary archive
+
+Download the release archive that matches your CPU architecture:
+
+- `netcheck-v<version>-linux-x86_64.tar.gz`
+- `netcheck-v<version>-linux-aarch64.tar.gz`
+
+Then extract it and move the binary into your `PATH`:
+
+```bash
+tar -xzf netcheck-v<version>-linux-x86_64.tar.gz
+sudo install -m 755 netcheck-v<version>-linux-x86_64/netcheck /usr/local/bin/netcheck
+```
+
+If you install from the raw binary archive, you must install the runtime dependencies yourself:
+
+- Debian / Ubuntu:
+
+```bash
+sudo apt install dnsutils iputils-tracepath traceroute
+```
+
+- Fedora / RHEL / Rocky / AlmaLinux:
+
+```bash
+sudo dnf install bind-utils iputils traceroute
+```
+
+- openSUSE:
+
+```bash
+sudo zypper install bind-utils iputils traceroute
+```
+
+`netcheck info`, `netcheck net`, and `netcheck speed` work with the bundled binary alone. `netcheck dns` needs `dig`, and `netcheck trace` needs `tracepath` or `traceroute`.
+
+### Option 3: Build from source
 
 ```bash
 cargo build --release
@@ -25,7 +79,7 @@ The binary is at `target/release/netcheck`.
 GitHub Actions automates the project lifecycle:
 
 - `CI`: runs `cargo fmt --check`, `cargo clippy -D warnings`, and `cargo test --locked` on pushes to `master` and pull requests
-- `Release`: on `v*` tags, builds release binaries for Linux `x86_64` and `aarch64`, packages them, creates a GitHub Release, and uploads the archives plus SHA-256 checksum files
+- `Release`: on `v*` tags, builds Linux release archives for `x86_64` and `aarch64`, builds native `.deb` and `.rpm` packages for `x86_64`, creates a GitHub Release, and uploads all artifacts plus SHA-256 checksum files
 
 Create a release with:
 
@@ -34,7 +88,7 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-The release assets are packaged as `tar.gz` archives because NetCheck is currently Linux-focused and depends on Linux system interfaces such as `/proc`, `/sys`, `tracepath`, and `dig`.
+NetCheck is currently Linux-focused and depends on Linux system interfaces such as `/proc`, `/sys`, `tracepath`, and `dig`.
 
 ## Usage
 

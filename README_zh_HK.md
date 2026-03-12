@@ -12,7 +12,61 @@
 - **DNS 測試** — 原始 UDP 查詢 6 個公共 DNS 解析器，按延遲排名
 - **路由追蹤** — tracepath 彩色輸出，無需 root 權限
 
-## 安裝
+## Installation Guide
+
+### 方式 1：安裝原生套件
+
+- Debian / Ubuntu：下載最新 Release 中的 `.deb` 檔案後安裝：
+
+```bash
+sudo apt install ./netcheck_<version>_amd64.deb
+```
+
+- Fedora / RHEL / Rocky / AlmaLinux / openSUSE：下載最新 Release 中的 `.rpm` 檔案後安裝：
+
+```bash
+sudo dnf install ./netcheck-<version>-1.x86_64.rpm
+```
+
+這類原生套件會宣告 `dns` 和 `trace` 子命令需要的執行時依賴，套件管理器可以自動處理。
+
+### 方式 2：直接使用二進位壓縮包
+
+下載與 CPU 架構相符的 Release 壓縮包：
+
+- `netcheck-v<version>-linux-x86_64.tar.gz`
+- `netcheck-v<version>-linux-aarch64.tar.gz`
+
+解壓後把二進位放進 `PATH`：
+
+```bash
+tar -xzf netcheck-v<version>-linux-x86_64.tar.gz
+sudo install -m 755 netcheck-v<version>-linux-x86_64/netcheck /usr/local/bin/netcheck
+```
+
+如果你是直接下載二進位壓縮包，系統依賴需要自行安裝：
+
+- Debian / Ubuntu：
+
+```bash
+sudo apt install dnsutils iputils-tracepath traceroute
+```
+
+- Fedora / RHEL / Rocky / AlmaLinux：
+
+```bash
+sudo dnf install bind-utils iputils traceroute
+```
+
+- openSUSE：
+
+```bash
+sudo zypper install bind-utils iputils traceroute
+```
+
+其中 `netcheck info`、`netcheck net`、`netcheck speed` 只需要程式本身即可執行；`netcheck dns` 需要 `dig`，`netcheck trace` 需要 `tracepath` 或 `traceroute`。
+
+### 方式 3：從原始碼編譯
 
 ```bash
 cargo build --release

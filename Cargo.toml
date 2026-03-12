@@ -2,6 +2,43 @@
 name = "netcheck"
 version = "0.1.0"
 edition = "2024"
+authors = ["Steven Zhang Yancheng"]
+description = "High-performance Linux CLI for network diagnostics, speed tests, DNS checks, and route tracing"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/Steven-ZYC/netcheck"
+homepage = "https://github.com/Steven-ZYC/netcheck"
+keywords = ["network", "speedtest", "dns", "cli"]
+categories = ["command-line-utilities", "network-programming"]
+
+[package.metadata.deb]
+maintainer = "Steven Zhang Yancheng"
+copyright = "2026, Steven Zhang Yancheng"
+section = "utility"
+priority = "optional"
+depends = "$auto, dnsutils, iputils-tracepath | traceroute"
+extended-description = """\
+NetCheck is a Linux CLI for system inspection, network interface discovery,
+HTTP-based latency and bandwidth testing, DNS latency checks, and route tracing.
+The DNS and trace modules rely on dig, tracepath, or traceroute at runtime.
+"""
+assets = [
+    ["target/release/netcheck", "usr/bin/netcheck", "755"],
+    ["README.md", "usr/share/doc/netcheck/README.md", "644"],
+    ["LICENSE", "usr/share/doc/netcheck/LICENSE", "644"],
+]
+
+[package.metadata.generate-rpm]
+summary = "High-performance Linux CLI for network diagnostics and speed tests"
+assets = [
+    { source = "target/release/netcheck", dest = "/usr/bin/netcheck", mode = "755" },
+    { source = "README.md", dest = "/usr/share/doc/netcheck/README.md", mode = "644", doc = true },
+    { source = "LICENSE", dest = "/usr/share/doc/netcheck/LICENSE", mode = "644", doc = true },
+]
+
+[package.metadata.generate-rpm.requires]
+bind-utils = "*"
+"(iputils or traceroute)" = ""
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }

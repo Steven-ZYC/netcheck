@@ -13,7 +13,7 @@ env:
   BINARY_NAME: netcheck
 
 jobs:
-  build:
+  build-static:
     name: Build ${{ matrix.target }}
     runs-on: ubuntu-latest
     strategy:
@@ -69,10 +69,52 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
+  package-native-linux:
+    name: Package native Linux artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: native-packages
+
+      - name: Install packaging tools
+        run: |
+          cargo install cargo-deb --locked
+          cargo install cargo-generate-rpm --locked
+
+      - name: Build native release binary
+        run: cargo build --release --locked
+
+      - name: Build Debian package
+        run: cargo deb --no-build
+
+      - name: Build RPM package
+        run: cargo generate-rpm
+
+      - name: Collect native package assets
+        run: ./scripts/collect-release-assets.sh target/debian/*.deb target/generate-rpm/*.rpm
+
+      - name: Upload native package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-native-packages
+          path: dist/*
+          if-no-files-found: error
+
   publish:
     name: Publish GitHub Release
     runs-on: ubuntu-latest
-    needs: build
+    needs:
+      - build-static
+      - package-native-linux
 
     steps:
       - name: Download packaged artifacts
