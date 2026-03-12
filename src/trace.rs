@@ -7,18 +7,13 @@ const MAX_HOPS: &str = "30";
 
 pub async fn run_trace() {
     crate::utils::print_section("Route Trace");
-    println!(
-        "    Target: \x1b[36m{}\x1b[0m (Cloudflare)",
-        TRACE_TARGET
-    );
+    println!("    Target: \x1b[36m{}\x1b[0m (Cloudflare)", TRACE_TARGET);
     println!();
 
     // Try tracepath first (no root needed), then traceroute
-    if !try_tracepath().await {
-        if !try_traceroute().await {
-            println!("    \x1b[31mError: neither tracepath nor traceroute found\x1b[0m");
-            println!("    Install with: \x1b[90msudo apt install iputils-tracepath\x1b[0m");
-        }
+    if !try_tracepath().await && !try_traceroute().await {
+        println!("    \x1b[31mError: neither tracepath nor traceroute found\x1b[0m");
+        println!("    Install with: \x1b[90msudo apt install iputils-tracepath\x1b[0m");
     }
     println!();
 }
@@ -37,11 +32,10 @@ async fn try_tracepath() -> bool {
     let stdout = child.stdout.take().unwrap();
     let mut reader = BufReader::new(stdout).lines();
 
-    loop {
-        match tokio::time::timeout(Duration::from_secs(5), reader.next_line()).await {
-            Ok(Ok(Some(line))) => print_trace_line(&line),
-            _ => break,
-        }
+    while let Ok(Ok(Some(line))) =
+        tokio::time::timeout(Duration::from_secs(5), reader.next_line()).await
+    {
+        print_trace_line(&line);
     }
 
     let _ = child.kill().await;
@@ -62,11 +56,10 @@ async fn try_traceroute() -> bool {
     let stdout = child.stdout.take().unwrap();
     let mut reader = BufReader::new(stdout).lines();
 
-    loop {
-        match tokio::time::timeout(Duration::from_secs(5), reader.next_line()).await {
-            Ok(Ok(Some(line))) => print_trace_line(&line),
-            _ => break,
-        }
+    while let Ok(Ok(Some(line))) =
+        tokio::time::timeout(Duration::from_secs(5), reader.next_line()).await
+    {
+        print_trace_line(&line);
     }
 
     let _ = child.kill().await;

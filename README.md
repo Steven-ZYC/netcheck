@@ -20,6 +20,22 @@ cargo build --release
 
 The binary is at `target/release/netcheck`.
 
+## CI/CD
+
+GitHub Actions automates the project lifecycle:
+
+- `CI`: runs `cargo fmt --check`, `cargo clippy -D warnings`, and `cargo test --locked` on pushes to `master` and pull requests
+- `Release`: on `v*` tags, builds release binaries for Linux `x86_64` and `aarch64`, packages them, creates a GitHub Release, and uploads the archives plus SHA-256 checksum files
+
+Create a release with:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The release assets are packaged as `tar.gz` archives because NetCheck is currently Linux-focused and depends on Linux system interfaces such as `/proc`, `/sys`, `tracepath`, and `dig`.
+
 ## Usage
 
 ```bash

@@ -1,6 +1,6 @@
 use std::io::Write;
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::time::{Duration, Instant};
 
 use futures::stream::StreamExt;
@@ -386,10 +386,7 @@ pub async fn run_speed_test(client: &reqwest::Client) {
     std::io::stdout().flush().ok();
     match test_latency(client).await {
         Ok((avg, jitter)) => {
-            println!(
-                "\x1b[32m{:.1} ms\x1b[0m (jitter: {:.1} ms)",
-                avg, jitter
-            );
+            println!("\x1b[32m{:.1} ms\x1b[0m (jitter: {:.1} ms)", avg, jitter);
         }
         Err(e) => println!("\x1b[31mError: {}\x1b[0m", e),
     }

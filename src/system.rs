@@ -40,14 +40,12 @@ fn get_cpu_model() -> String {
     std::fs::read_to_string("/proc/cpuinfo")
         .ok()
         .and_then(|s| {
-            s.lines()
-                .find(|l| l.starts_with("model name"))
-                .map(|l| {
-                    l.split(':')
-                        .nth(1)
-                        .map(|s| s.trim().to_string())
-                        .unwrap_or_else(|| "Unknown".to_string())
-                })
+            s.lines().find(|l| l.starts_with("model name")).map(|l| {
+                l.split(':')
+                    .nth(1)
+                    .map(|s| s.trim().to_string())
+                    .unwrap_or_else(|| "Unknown".to_string())
+            })
         })
         .unwrap_or_else(|| "Unknown".to_string())
 }
